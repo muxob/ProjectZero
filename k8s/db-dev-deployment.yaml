@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pz-db-dev-svc
+  labels:
+    app: project-zero
+    tier: database
+    phase: dev
+spec:
+  ports:
+  - port: 3306
+  type: NodePort # consider clusterIP: None for prod
+  selector:
+    app: project-zero
+    tier: database
+    phase: dev
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-dev-deploy
+  labels:
+    app: project-zero
+    tier: database
+    phase: dev
+spec:
+  selector:
+    matchLabels:
+      app: project-zero
+      tier: database
+      phase: dev
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: project-zero
+        tier: database
+        phase: dev
+    spec:
+      containers:
+      - image: mariadb:10.2.14
+        name: pz-db-dev-pod
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pz-dev-secrets
+              key: dbpassword
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: pz-dev-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: pz-dev-persistent-storage
+        persistentVolumeClaim:
+          claimName: pz-dev-pv-claim
