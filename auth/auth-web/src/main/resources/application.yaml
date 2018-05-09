@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://${AUTH_DB_SERVER:dbserver}:${AUTH_DB_PORT:30367}/authdb
+    username: ${AUTH_DB_USER:dbuser}
+    password: ${AUTH_DB_PASS:dbpass}
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+
+server:
+  port: 9999
+  contextPath: /uaa
+  #use-forward-headers: true
+
+security:
+  user:
+    password: none
+  oauth2:
+    client:
+      clientId: pz
+      clientSecret: pzsecret
+      authorized-grant-types: authorization_code,refresh_token,password,client_credentials
+      scope: openid
